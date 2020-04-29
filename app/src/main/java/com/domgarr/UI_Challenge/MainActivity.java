@@ -36,13 +36,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         setContentView(R.layout.activity_main);
-        //TODO: Restore previously selected category after rotation.
+        
         //Get reference to tool bar and set tool bar as action bar.
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.draw_layout);
         //Add Hamburger icon.
+        //TODO: The strings for impaired should be stored in Resources.
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState(); //Adds hamburger rotation as drawer opens.
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Add dynamic items to NavigationView.
         navView = findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
-        menu.setGroupCheckable(0,true,true);
+
         //Can safely use 0th index to grab submen since 'Categories' is the only Menu in menu's layout.
         SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
 
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navView.setCheckedItem(categorySelected);
         }
 
-        //TODO: Add a default fragment.
+        //TODO: Add a default fragment?
     }
 
     @Override
@@ -84,28 +85,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        SONGS = getCategories().get(item.getItemId()).getList();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SongFragment()).commit();
+        //Re-instantiate the fragment only if a differnt category is chosen.
+        if(categorySelected == null || item.getItemId() != categorySelected) {
+            //I decided to store the songs into a variable, instead of passing into a bundle to reduce complexity.
+            SONGS = getCategories().get(item.getItemId()).getList();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SongFragment()).commit();
 
-        navView.setCheckedItem(item.getItemId());
-        categorySelected = item.getItemId();
+            /* MenuItems are in a group containing single click behaviour meaning that deselecting
+            items will be taking care of after.
+             */
+            navView.setCheckedItem(item.getItemId());
+            categorySelected = item.getItemId();
+
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        }
 
         drawer.closeDrawer(GravityCompat.START);
-        return true; //If false is returned, no item will be selected.
+        return false; //If false is returned, no item will be selected.
     }
 
+    /**
+     *
+     * @return List of Category models containing a list of Songs.
+     */
     private List<Category> getCategories(){
         List<Category> categories = new ArrayList<>();
 
         List<com.domgarr.UI_Challenge.models.Song> rockSongs = new ArrayList<com.domgarr.UI_Challenge.models.Song>();
-        rockSongs.add(new com.domgarr.UI_Challenge.models.Song("Stairway To Heaven."));
-        rockSongs.add(new com.domgarr.UI_Challenge.models.Song("We Will Rock You."));
+        rockSongs.add(new Song("Stairway To Heaven."));
+        rockSongs.add(new Song("We Will Rock You."));
         Category rock = new Category("rock", rockSongs);
         categories.add(rock);
 
         List<com.domgarr.UI_Challenge.models.Song> classicalSongs = new ArrayList<com.domgarr.UI_Challenge.models.Song>();
-        classicalSongs.add(new com.domgarr.UI_Challenge.models.Song("SIBELIUS Violin Concerto in D minor, Op. 47"));
-        classicalSongs.add(new com.domgarr.UI_Challenge.models.Song("Clair De Lune"));
+        classicalSongs.add(new Song("SIBELIUS Violin Concerto in D minor, Op. 47"));
+        classicalSongs.add(new Song("Clair De Lune"));
 
         Category classical = new Category("classical", classicalSongs);
         categories.add(classical);

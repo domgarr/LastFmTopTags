@@ -28,14 +28,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
 
     private Integer categorySelected;
+    private String appBarTitle;
+
     private static final String CATEGORY_SELECTED = "categorySelected";
+    private static final String APP_BAR_TITLE = "appBarTitle";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        appBarTitle = getString(R.string.home);
         if(savedInstanceState != null){
             categorySelected = savedInstanceState.getInt(CATEGORY_SELECTED);
+            appBarTitle = savedInstanceState.getString(APP_BAR_TITLE);
         }
 
         setContentView(R.layout.activity_main);
@@ -44,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //TODO: Title doesn't persist through rotation.
-        setTitle(R.string.home);
+        setTitle(appBarTitle);
 
 
         //TODO: Refactor into two methods.
@@ -108,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navView.setCheckedItem(item.getItemId());
             categorySelected = item.getItemId();
             setTitle(getCategories().get(item.getItemId()).getName());
+            appBarTitle = getTitle().toString();
 
             drawer.closeDrawer(GravityCompat.START);
             return true;
@@ -148,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         if(categorySelected != null){
             outState.putInt(CATEGORY_SELECTED, categorySelected);
+            outState.putString(APP_BAR_TITLE, appBarTitle);
         }
 
         super.onSaveInstanceState(outState);

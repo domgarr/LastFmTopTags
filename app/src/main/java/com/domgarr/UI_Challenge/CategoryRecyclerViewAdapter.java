@@ -16,11 +16,15 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
 
     private final List<Category> categories;
     private final OnListFragmentInteractionListener listener;
+
     private int selectedPosition = RecyclerView.NO_POSITION;
 
-    public CategoryRecyclerViewAdapter(List<Category> categories, OnListFragmentInteractionListener listener) {
+    public CategoryRecyclerViewAdapter(List<Category> categories, OnListFragmentInteractionListener listener, Integer lastCategoryPosition) {
         this.categories = categories;
         this.listener = listener;
+        if(lastCategoryPosition != null){
+            selectedPosition = lastCategoryPosition;
+        }
     }
 
     @Override
@@ -41,6 +45,7 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
     public int getItemCount() {
         return categories.size();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View view;

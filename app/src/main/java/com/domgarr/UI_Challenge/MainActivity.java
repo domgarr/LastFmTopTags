@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Integer categorySelected;
     private String appBarTitle;
 
-    private static final String CATEGORY_SELECTED = "categorySelected";
+    public static final String CATEGORY_SELECTED = "categorySelected";
     private static final String APP_BAR_TITLE = "appBarTitle";
 
     @Override
@@ -57,7 +58,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //TODO: Refactor into two methods.
         int orientation = getResources().getConfiguration().orientation;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_categories, new CategoryFragment()).commit();
+            Fragment categoryFragment = new CategoryFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt(CATEGORY_SELECTED, categorySelected);
+            categoryFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_categories, categoryFragment).commit();
         }else{
             drawer = findViewById(R.id.draw_layout);
             //Add Hamburger icon.

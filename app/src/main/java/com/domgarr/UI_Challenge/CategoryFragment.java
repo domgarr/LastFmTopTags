@@ -3,6 +3,7 @@ package com.domgarr.UI_Challenge;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +26,7 @@ import java.util.List;
 public class CategoryFragment extends Fragment {
 
     private OnListFragmentInteractionListener listener;
+    private Integer lastCategoryPosition;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -37,6 +39,15 @@ public class CategoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Bundle bundle = this.getArguments();
+        if(bundle != null){
+            lastCategoryPosition = bundle.getInt(MainActivity.CATEGORY_SELECTED);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -49,7 +60,7 @@ public class CategoryFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new CategoryRecyclerViewAdapter(MainActivity.CATEGORIES, listener));
+            recyclerView.setAdapter(new CategoryRecyclerViewAdapter(MainActivity.CATEGORIES, listener, lastCategoryPosition));
         }
         return view;
     }
@@ -86,4 +97,6 @@ public class CategoryFragment extends Fragment {
         // TODO: Update argument type and name
         void onListFragmentInteraction(int categoryPosition);
     }
+
+
 }

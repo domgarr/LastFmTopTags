@@ -8,16 +8,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.domgarr.UI_Challenge.CategoryFragment.OnListFragmentInteractionListener;
-import com.domgarr.UI_Challenge.dummy.DummyContent.DummyItem;
 import com.domgarr.UI_Challenge.models.Category;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.ViewHolder> {
 
     private final List<Category> categories;

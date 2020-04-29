@@ -9,6 +9,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -20,8 +21,9 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SongFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SongFragment.OnListFragmentInteractionListener, CategoryFragment.OnListFragmentInteractionListener {
     public static List<Song> SONGS;
+    public static List<Category> CATEGORIES;
 
     private NavigationView navView;
     private DrawerLayout drawer;
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //TODO: Refactor into two methods.
         int orientation = getResources().getConfiguration().orientation;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_categories, new CategoryFragment()).commit();
         }else{
             drawer = findViewById(R.id.draw_layout);
             //Add Hamburger icon.
@@ -143,12 +145,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Category classical = new Category("Classical", classicalSongs);
         categories.add(classical);
 
+        CATEGORIES = categories;
         return categories;
     }
 
-    @Override
-    public void onListFragmentInteraction(Song item) {
-    }
+
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -158,5 +159,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         super.onSaveInstanceState(outState);
+    }
+
+    /*
+    The following two implementations are required by List Fragments generated via Android Studio
+    */
+    @Override
+    public void onListFragmentInteraction(Song item) {
+    }
+
+    @Override
+    public void onListFragmentInteraction(int categoryPosition) {
+        Log.d("POS", categoryPosition + "");
+        SONGS = getCategories().get(categoryPosition).getList();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
+        categorySelected = categoryPosition;
+        setTitle(getCategories().get(categoryPosition).getName());
+        appBarTitle = getTitle().toString();
     }
 }

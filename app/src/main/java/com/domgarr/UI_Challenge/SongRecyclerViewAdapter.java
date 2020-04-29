@@ -96,6 +96,7 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
         @Override
         public void onClick(View v) {
             //Selected song is highlighted here.
+            //TODO: Understand this better.
             notifyItemChanged(selectedPosition);
             selectedPosition = getLayoutPosition();
             notifyItemChanged(selectedPosition);

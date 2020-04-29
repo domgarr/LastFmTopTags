@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,36 +43,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Get reference to tool bar and set tool bar as action bar.
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //TODO: Title doesn't persist through rotation.
         setTitle(R.string.home);
 
 
-        drawer = findViewById(R.id.draw_layout);
-        //Add Hamburger icon.
-        //TODO: The strings for impaired should be stored in Resources.
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState(); //Adds hamburger rotation as drawer opens.
+        //TODO: Refactor into two methods.
+        int orientation = getResources().getConfiguration().orientation;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
 
-        //Add dynamic items to NavigationView.
-        navView = findViewById(R.id.nav_view);
-        Menu menu = navView.getMenu();
+        }else{
+            drawer = findViewById(R.id.draw_layout);
+            //Add Hamburger icon.
+            //TODO: The strings for impaired should be stored in Resources.
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState(); //Adds hamburger rotation as drawer opens.
+            //Add dynamic items to NavigationView.
+            navView = findViewById(R.id.nav_view);
+            Menu menu = navView.getMenu();
 
-        //Can safely use 0th index to grab submen since 'Categories' is the only Menu in menu's layout.
-        SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
+            //Can safely use 0th index to grab submen since 'Categories' is the only Menu in menu's layout.
+            SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
 
-        ArrayList<Category> categories = (ArrayList) getCategories();
+            ArrayList<Category> categories = (ArrayList) getCategories();
 
-        //Dynamically add MenuItems to SubMenu 'Categories'
-        int itemId = 0;
-        for(Category category : categories) {
-            MenuItem newMenuItem = categorySubMenu.add(0, itemId++, Menu.NONE, category.getName());
-            newMenuItem.setCheckable(true);
-        }
+            //Dynamically add MenuItems to SubMenu 'Categories'
+            int itemId = 0;
+            for(Category category : categories) {
+                MenuItem newMenuItem = categorySubMenu.add(0, itemId++, Menu.NONE, category.getName());
+                newMenuItem.setCheckable(true);
+            }
 
-        navView.setNavigationItemSelectedListener(this);
+            navView.setNavigationItemSelectedListener(this);
 
-        if(categorySelected != null){
-            navView.setCheckedItem(categorySelected);
+            if(categorySelected != null){
+                navView.setCheckedItem(categorySelected);
+            }
         }
 
         //TODO: Add a default fragment?
@@ -93,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(categorySelected == null || item.getItemId() != categorySelected) {
             //I decided to store the songs into a variable, instead of passing into a bundle to reduce complexity.
             SONGS = getCategories().get(item.getItemId()).getList();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SongFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
 
             /* MenuItems are in a group containing single click behaviour meaning that deselecting
             items will be taking care of after.

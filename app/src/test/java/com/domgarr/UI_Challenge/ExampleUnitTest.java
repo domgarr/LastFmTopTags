@@ -1,4 +1,4 @@
-package com.domgarr.fromscratch;
+package com.domgarr.UI_Challenge;
 
 import org.junit.Test;
 

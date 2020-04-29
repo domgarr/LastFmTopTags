@@ -1,4 +1,4 @@
-package com.domgarr.fromscratch;
+package com.domgarr.UI_Challenge;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -7,13 +7,19 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.drm.DrmStore;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ScaleGestureDetector;
 import android.view.SubMenu;
+import android.widget.ArrayAdapter;
 
+import com.domgarr.UI_Challenge.models.Category;
+import com.domgarr.UI_Challenge.models.Song;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawer;
@@ -37,8 +43,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Menu menu = navView.getMenu();
         SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
         categorySubMenu.setGroupCheckable(0,true,true);
-        categorySubMenu.add(0,1,Menu.NONE, "Rock");
-        categorySubMenu.add(0,2,Menu.NONE, "Classical");
+
+        ArrayList<Category> categories = (ArrayList) getCategories();
+
+        int itemId = 0;
+        for(Category category : categories) {
+            categorySubMenu.add(0, itemId++, Menu.NONE, category.getName());
+        }
         navView.setNavigationItemSelectedListener(this);
 
     }
@@ -65,5 +76,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         item.setChecked(true);
         drawer.closeDrawer(GravityCompat.START);
         return true; //If false is returned, no item will be selected.
+    }
+
+    private List<Category> getCategories(){
+        List<Category> categories = new ArrayList<>();
+
+        List<Song> rockSongs = new ArrayList<Song>();
+        rockSongs.add(new Song("Stair way to heaven"));
+        Category rock = new Category("rock", rockSongs);
+        categories.add(rock);
+
+        List<Song> classicalSongs = new ArrayList<Song>();
+        classicalSongs.add(new Song("SIBELIUS Violin Concerto in D minor, Op. 47"));
+        Category classical = new Category("classical", classicalSongs);
+        categories.add(classical);
+
+        return categories;
+
     }
 }

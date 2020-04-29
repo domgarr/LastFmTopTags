@@ -5,7 +5,7 @@
     <item android:title="Categories"
         android:id="@+id/categories">
         <menu android:id="@+id/categories_menu">
-            <group android:checkableBehavior="single">
+            <group >
 
             </group>
         </menu>

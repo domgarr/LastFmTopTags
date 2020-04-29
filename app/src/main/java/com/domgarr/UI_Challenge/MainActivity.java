@@ -20,11 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SongFragment.OnListFragmentInteractionListener {
-    private DrawerLayout drawer;
     public static List<Song> SONGS;
+
+    private NavigationView navView;
+    private DrawerLayout drawer;
+    private Integer categorySelected;
+    private static final String CATEGORY_SELECTED = "categorySelected";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null){
+            categorySelected = savedInstanceState.getInt(CATEGORY_SELECTED);
+        }
+
         setContentView(R.layout.activity_main);
         //TODO: Restore previously selected category after rotation.
         //Get reference to tool bar and set tool bar as action bar.
@@ -38,20 +48,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState(); //Adds hamburger rotation as drawer opens.
 
         //Add dynamic items to NavigationView.
-        NavigationView navView = findViewById(R.id.nav_view);
+        navView = findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
+        menu.setGroupCheckable(0,true,true);
         //Can safely use 0th index to grab submen since 'Categories' is the only Menu in menu's layout.
         SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
-        categorySubMenu.setGroupCheckable(0,true,true);
 
         ArrayList<Category> categories = (ArrayList) getCategories();
 
         //Dynamically add MenuItems to SubMenu 'Categories'
         int itemId = 0;
         for(Category category : categories) {
-            categorySubMenu.add(0, itemId++, Menu.NONE, category.getName());
+            MenuItem newMenuItem = categorySubMenu.add(0, itemId++, Menu.NONE, category.getName());
+            newMenuItem.setCheckable(true);
         }
+
         navView.setNavigationItemSelectedListener(this);
+
+        if(categorySelected != null){
+            navView.setCheckedItem(categorySelected);
+        }
 
         //TODO: Add a default fragment.
     }
@@ -64,12 +80,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
     }
-    //TODO: When a category is selected, othere categories should be unselected.
+    //TODO: When a category is selected, while already being selected, the song item selected is lost. Prevent app from re-initialzing an Fragment if category is clicked twice.
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         SONGS = getCategories().get(item.getItemId()).getList();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SongFragment()).commit();
-        item.setChecked(true);
+
+        navView.setCheckedItem(item.getItemId());
+        categorySelected = item.getItemId();
+
         drawer.closeDrawer(GravityCompat.START);
         return true; //If false is returned, no item will be selected.
     }
@@ -95,5 +115,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onListFragmentInteraction(Song item) {
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        if(categorySelected != null){
+            outState.putInt(CATEGORY_SELECTED, categorySelected);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 }

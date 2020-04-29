@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private NavigationView navView;
     private DrawerLayout drawer;
+    private Toolbar toolbar;
+
     private Integer categorySelected;
     private static final String CATEGORY_SELECTED = "categorySelected";
 
@@ -36,10 +38,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         setContentView(R.layout.activity_main);
-        
+
         //Get reference to tool bar and set tool bar as action bar.
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle(R.string.home);
+
 
         drawer = findViewById(R.id.draw_layout);
         //Add Hamburger icon.
@@ -96,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
              */
             navView.setCheckedItem(item.getItemId());
             categorySelected = item.getItemId();
+            setTitle(getCategories().get(item.getItemId()).getName());
 
             drawer.closeDrawer(GravityCompat.START);
             return true;
@@ -115,14 +120,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         List<com.domgarr.UI_Challenge.models.Song> rockSongs = new ArrayList<com.domgarr.UI_Challenge.models.Song>();
         rockSongs.add(new Song("Stairway To Heaven."));
         rockSongs.add(new Song("We Will Rock You."));
-        Category rock = new Category("rock", rockSongs);
+        Category rock = new Category("Rock", rockSongs);
         categories.add(rock);
 
         List<com.domgarr.UI_Challenge.models.Song> classicalSongs = new ArrayList<com.domgarr.UI_Challenge.models.Song>();
         classicalSongs.add(new Song("SIBELIUS Violin Concerto in D minor, Op. 47"));
         classicalSongs.add(new Song("Clair De Lune"));
 
-        Category classical = new Category("classical", classicalSongs);
+        Category classical = new Category("Classical", classicalSongs);
         categories.add(classical);
 
         return categories;

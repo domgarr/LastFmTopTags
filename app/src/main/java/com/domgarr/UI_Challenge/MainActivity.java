@@ -121,10 +121,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Add dynamic items to NavigationView.
         navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
-
-        if (tagSelected != null) {
-            navView.setCheckedItem(tagSelected);
-        }
     }
 
     private void initToolbar() {
@@ -167,6 +163,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (Tag tag : tags) {
             MenuItem newMenuItem = categorySubMenu.add(0, itemId++, Menu.NONE, tag.getName());
             newMenuItem.setCheckable(true);
+        }
+
+        if (tagSelected != null) {
+            navView.setCheckedItem(tagSelected);
         }
     }
 

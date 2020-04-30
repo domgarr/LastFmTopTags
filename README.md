@@ -1,4 +1,6 @@
 # UI-Challenge
+## Installation
+Clone or download ZIP and simply open in Android Studios.
 
 ## Features
 ### Portrait Mode

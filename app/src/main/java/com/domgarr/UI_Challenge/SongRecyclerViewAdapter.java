@@ -2,7 +2,6 @@ package com.domgarr.UI_Challenge;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,9 @@ import android.widget.TextView;
 
 import com.domgarr.UI_Challenge.SongFragment.OnListFragmentInteractionListener;
 import com.domgarr.UI_Challenge.models.Song;
+import com.domgarr.UI_Challenge.models.Track;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -21,7 +23,7 @@ import java.util.List;
  */
 public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Song> songs;
+    private final List<Track> tracks;
     private final OnListFragmentInteractionListener listener;
     private int selectedPosition = RecyclerView.NO_POSITION;
 
@@ -29,8 +31,8 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
         return selectedPosition;
     }
 
-    public SongRecyclerViewAdapter(List<Song> songs, OnListFragmentInteractionListener listener, Integer restoredSelectedPosition) {
-        this.songs = songs;
+    public SongRecyclerViewAdapter(List<Track> tracks, OnListFragmentInteractionListener listener, Integer restoredSelectedPosition) {
+        this.tracks = tracks;
         this.listener = listener;
 
         //Check to see if a previously selected position exists.
@@ -48,8 +50,10 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.song = songs.get(position);
-        holder.songNameView.setText(songs.get(position).getName());
+        holder.track = tracks.get(position);
+        holder.trackNameView.setText(tracks.get(position).getName());
+        holder.trackArtistView.setText(tracks.get(position).getArtist().getName());
+        holder.trackRankView.setText(String.valueOf(tracks.get(position).getAttr().getRank()));
         /* Setting itemView to selected state satisfies the selector in res/drawable/song_item
             and will highlight with given color.
          */
@@ -61,7 +65,7 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
                 if (null != listener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    listener.onListFragmentInteraction(holder.song);
+                    listener.onListFragmentInteraction(holder.track);
                 }
             }
         });
@@ -69,28 +73,30 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
 
     @Override
     public int getItemCount() {
-        return songs.size();
+        return tracks.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View view;
+        public final TextView trackNameView;
+        public final TextView trackArtistView;
+        public final TextView trackRankView;
 
-        public final TextView songNameView;
-        public Song song;
+        public Track track;
 
         public ViewHolder(View view) {
             super(view);
             this.view = view;
 
-            LinearLayout mSongParent = (LinearLayout) view.findViewById(R.id.song_linear_layout);
-
-            songNameView = (TextView) view.findViewById(R.id.song_name);
-            songNameView.setOnClickListener(this);
+            trackNameView = (TextView) view.findViewById(R.id.song_name);
+            trackArtistView = (TextView) view.findViewById(R.id.artist_name);
+            trackRankView = (TextView) view.findViewById(R.id.song_rank);
+            trackNameView.setOnClickListener(this);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + songNameView.getText() + "'";
+            return super.toString() + " '" + trackNameView.getText() + "'";
         }
 
         @Override

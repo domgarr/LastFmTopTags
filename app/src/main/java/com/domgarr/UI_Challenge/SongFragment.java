@@ -13,33 +13,33 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.domgarr.UI_Challenge.models.Song;
+import com.domgarr.UI_Challenge.models.TopTrackResponse;
+import com.domgarr.UI_Challenge.models.Track;
 
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
+
 public class SongFragment extends Fragment {
-    //TODO: Rename variables to be in align with entire project.
+    private RecyclerView recyclerView;
     private SongRecyclerViewAdapter songRecyclerViewAdapter;
     public static final String SELECTED_POSITION = "selectedPosition";
     private Integer selectedPosition;
 
-    private OnListFragmentInteractionListener listener; //TODO: Figure out why this is needed.
-    private List<Song> songs;
 
+    private OnListFragmentInteractionListener listener;
+    private List<Track> tracks;
+    private String tagName;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public SongFragment() {
-    }
-
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static SongFragment newInstance(int columnCount) {
-        SongFragment fragment = new SongFragment();
-        Bundle args = new Bundle();
-        //args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -54,7 +54,13 @@ public class SongFragment extends Fragment {
         if(savedInstanceState != null) {
             selectedPosition = savedInstanceState.getInt(SELECTED_POSITION);
         }
-        //Here make API call eventually.
+
+        Bundle bundle = getArguments();
+        if(bundle != null){
+            tagName = bundle.getString(MainActivity.TAG_NAME);
+        }
+
+        requestTopTracks();
     }
 
     @Override
@@ -64,12 +70,8 @@ public class SongFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            songRecyclerViewAdapter = new SongRecyclerViewAdapter(MainActivity.SONGS, listener, selectedPosition);
-            if(MainActivity.SONGS != null){
-                recyclerView.setAdapter(songRecyclerViewAdapter);
-            }
         }
         return view;
     }
@@ -91,20 +93,38 @@ public class SongFragment extends Fragment {
         listener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(Song item);
+        void onListFragmentInteraction(Track track);
     }
 
+    private void requestTopTracks(){
+        Single<Response<TopTrackResponse>> call = LastFm.getInstance().getLastFmService().topTracks(LastFm.API_KEY, tagName, MainActivity.TOP_TRACK_LIMIT);
+
+                call
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new SingleObserver<Response<TopTrackResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Response<TopTrackResponse> topTrackResponseResponse) {
+                        /*
+                        getTracks() called twice is due to the layout of the API
+                         */
+                        tracks = topTrackResponseResponse.body().getTracks().getTracks();
+                        songRecyclerViewAdapter = new SongRecyclerViewAdapter(tracks, listener, selectedPosition);
+                        recyclerView.setAdapter(songRecyclerViewAdapter);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+
+    }
 
 }

@@ -10,20 +10,16 @@ import androidx.fragment.app.Fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
 
-import com.domgarr.UI_Challenge.models.Category;
 import com.domgarr.UI_Challenge.models.Song;
 import com.domgarr.UI_Challenge.models.Tag;
 import com.domgarr.UI_Challenge.models.TopTagResponse;
+import com.domgarr.UI_Challenge.models.Track;
 import com.google.android.material.navigation.NavigationView;
 
-
-import java.util.ArrayList;
 
 import java.util.List;
 
@@ -37,26 +33,28 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SongFragment.OnListFragmentInteractionListener, CategoryFragment.OnListFragmentInteractionListener {
     public static List<Song> SONGS;
     public static List<Tag> tags;
+    public static final int TOP_TRACK_LIMIT = 15;
 
     private NavigationView navView;
     private DrawerLayout drawer;
     private Toolbar toolbar;
 
-    private Integer categorySelected;
+    private Integer tagSelected;
     private String appBarTitle;
 
     public static final String CATEGORY_SELECTED = "categorySelected";
+    public static final String TAG_NAME = "tagName";
     private static final String APP_BAR_TITLE = "appBarTitle";
 
-
+    private String tagName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         appBarTitle = getString(R.string.home);
-        if(savedInstanceState != null){
-            categorySelected = savedInstanceState.getInt(CATEGORY_SELECTED);
+        if (savedInstanceState != null) {
+            tagSelected = savedInstanceState.getInt(CATEGORY_SELECTED);
             appBarTitle = savedInstanceState.getString(APP_BAR_TITLE);
         }
 
@@ -65,41 +63,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //TODO: Refactor into two methods.
         int orientation = getResources().getConfiguration().orientation;
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Fragment categoryFragment = new CategoryFragment();
             Bundle bundle = new Bundle();
-            bundle.putInt(CATEGORY_SELECTED, categorySelected);
+            bundle.putInt(CATEGORY_SELECTED, tagSelected);
             categoryFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_categories, categoryFragment).commit();
-        }else{
+        } else {
             requestTopTags(); //Async. fetch top tags from LastFm.
             initDrawerSlider();
         }
     }
 
     @Override
-    public void onBackPressed(){
-        if(drawer.isDrawerOpen(GravityCompat.START)){
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }else{
+        } else {
             super.onBackPressed();
         }
     }
+
     //TODO: When a category is selected, while already being selected, the song item selected is lost. Prevent app from re-initialzing an Fragment if category is clicked twice.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         //Re-instantiate the fragment only if a differnt category is chosen.
-        if(categorySelected == null || item.getItemId() != categorySelected) {
-            //I decided to store the songs into a variable, instead of passing into a bundle to reduce complexity.
-            //SONGS = getCategories().get(item.getItemId()).getList();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
-
-            /* MenuItems are in a group containing single click behaviour meaning that deselecting
-            items will be taking care of after.
-             */
+        if (tagSelected == null || item.getItemId() != tagSelected) {
             navView.setCheckedItem(item.getItemId());
-            categorySelected = item.getItemId();
-            //setTitle(getCategories().get(item.getItemId()).getName());
+            tagSelected = item.getItemId();
+            tagName = tags.get(tagSelected).getName();
+
+            Fragment songFragment = new SongFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(TAG_NAME, tagName);
+            songFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, songFragment).commit();
+
+            setTitle(tagName);
             appBarTitle = getTitle().toString();
 
             drawer.closeDrawer(GravityCompat.START);
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false; //If false is returned, no item will be selected.
     }
 
-    private void initDrawerSlider(){
+    private void initDrawerSlider() {
         drawer = findViewById(R.id.draw_layout);
         //Add Hamburger icon.
         //TODO: The strings for impaired should be stored in Resources.
@@ -121,19 +121,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
 
-        if(categorySelected != null){
-            navView.setCheckedItem(categorySelected);
+        if (tagSelected != null) {
+            navView.setCheckedItem(tagSelected);
         }
     }
 
-    private void initToolbar(){
+    private void initToolbar() {
         //Get reference to tool bar and set tool bar as action bar.
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle(appBarTitle);
     }
 
-    private void requestTopTags(){
+    private void requestTopTags() {
         Single<Response<TopTagResponse>> call = LastFm.getInstance().getLastFmService().topTags(LastFm.API_KEY);
         call.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -156,14 +156,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
     }
 
-    private void populateDrawerMenu(List<Tag> tags){
+    private void populateDrawerMenu(List<Tag> tags) {
         Menu menu = navView.getMenu();
         //Can safely use 0th index to grab submen since 'Categories' is the only Menu in menu's layout.
         SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
 
         //Dynamically add MenuItems to SubMenu 'Categories'
         int itemId = 0;
-        for(Tag tag : tags) {
+        for (Tag tag : tags) {
             MenuItem newMenuItem = categorySubMenu.add(0, itemId++, Menu.NONE, tag.getName());
             newMenuItem.setCheckable(true);
         }
@@ -171,11 +171,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        if(categorySelected != null){
-            outState.putInt(CATEGORY_SELECTED, categorySelected);
+        if (tagSelected != null) {
+            outState.putInt(CATEGORY_SELECTED, tagSelected);
             outState.putString(APP_BAR_TITLE, appBarTitle);
-        }
+            outState.putString(TAG_NAME, tagName);
 
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -183,13 +184,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     The following two implementations are required by List Fragments generated via Android Studio
     */
     @Override
-    public void onListFragmentInteraction(Song item) {
+    public void onListFragmentInteraction(Track track) {
     }
 
     @Override
-    public void onListFragmentInteraction(String tagname) {
-        Log.d("POS", tagname + "");
-       // SONGS = getCategories().get(tagname).getList();
+    public void onListFragmentInteraction(String tagName) {
+        this.tagName = tagName;
+        // SONGS = getCategories().get(tagname).getList();
         //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
         //categorySelected = tagname;
         //setTitle(getCategories().get(tagname).getName());

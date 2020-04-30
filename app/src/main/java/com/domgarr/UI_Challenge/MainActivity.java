@@ -32,6 +32,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TrackFragment.OnListFragmentInteractionListener, TagFragment.OnListFragmentInteractionListener {
     public static List<Tag> tags;
     public static final int TOP_TRACK_LIMIT = 15;
+    private static int TABLET_MODE_WIDTH = 943;
 
     private NavigationView navView;
     private DrawerLayout drawer;
@@ -56,15 +57,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             appBarTitle = savedInstanceState.getString(APP_BAR_TITLE);
         }
 
+        Configuration config = getResources().getConfiguration();
+        int smallestScreenWidthDp = config.smallestScreenWidthDp;
+
         setContentView(R.layout.activity_main);
         initToolbar();
 
         //TODO: Refactor into two methods.
         int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE || smallestScreenWidthDp > TABLET_MODE_WIDTH) {
             Fragment categoryFragment = new TagFragment();
             Bundle bundle = new Bundle();
-            bundle.putInt(CATEGORY_SELECTED, tagSelected);
+            if(tagSelected != null) {
+                bundle.putInt(CATEGORY_SELECTED, tagSelected);
+            }
             categoryFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_categories, categoryFragment).commit();
         } else {
@@ -186,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onListFragmentInteraction(String tagName) {
-        Log.d("TEST", tagName);
         this.tagName = tagName;
 
         Fragment songFragment = new TrackFragment();

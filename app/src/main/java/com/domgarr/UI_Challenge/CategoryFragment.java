@@ -106,7 +106,7 @@ public class CategoryFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(int categoryPosition);
+        void onListFragmentInteraction(String tagName);
     }
 
     private void requestTopTags(){
@@ -132,6 +132,4 @@ public class CategoryFragment extends Fragment {
                     }
                 });
     }
-
-
 }

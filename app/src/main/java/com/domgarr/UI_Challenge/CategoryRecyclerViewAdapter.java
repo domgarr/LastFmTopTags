@@ -69,7 +69,7 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
             notifyItemChanged(selectedPosition);
             selectedPosition = getLayoutPosition();
             notifyItemChanged(selectedPosition);
-            listener.onListFragmentInteraction(selectedPosition);
+            listener.onListFragmentInteraction(tags.get(selectedPosition).getName());
         }
     }
 }

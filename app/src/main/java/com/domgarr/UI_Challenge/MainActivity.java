@@ -14,9 +14,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 
 import com.domgarr.UI_Challenge.models.Category;
 import com.domgarr.UI_Challenge.models.Song;
+import com.domgarr.UI_Challenge.models.Tag;
+import com.domgarr.UI_Challenge.models.TopTagResponse;
 import com.google.android.material.navigation.NavigationView;
 
 
@@ -24,9 +27,16 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SongFragment.OnListFragmentInteractionListener, CategoryFragment.OnListFragmentInteractionListener {
     public static List<Song> SONGS;
-    public static List<Category> CATEGORIES;
+    public static List<Tag> tags;
 
     private NavigationView navView;
     private DrawerLayout drawer;
@@ -51,18 +61,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         setContentView(R.layout.activity_main);
+        initToolbar();
 
-        //Get reference to tool bar and set tool bar as action bar.
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        //TODO: Title doesn't persist through rotation.
-        setTitle(appBarTitle);
-
-
-
-
-
-                 //TODO: Refactor into two methods.
+        //TODO: Refactor into two methods.
         int orientation = getResources().getConfiguration().orientation;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             Fragment categoryFragment = new CategoryFragment();
@@ -71,36 +72,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             categoryFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_categories, categoryFragment).commit();
         }else{
-            drawer = findViewById(R.id.draw_layout);
-            //Add Hamburger icon.
-            //TODO: The strings for impaired should be stored in Resources.
-            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.addDrawerListener(toggle);
-            toggle.syncState(); //Adds hamburger rotation as drawer opens.
-            //Add dynamic items to NavigationView.
-            navView = findViewById(R.id.nav_view);
-            Menu menu = navView.getMenu();
-
-            //Can safely use 0th index to grab submen since 'Categories' is the only Menu in menu's layout.
-            SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
-
-            ArrayList<Category> categories = (ArrayList) getCategories();
-
-            //Dynamically add MenuItems to SubMenu 'Categories'
-            int itemId = 0;
-            for(Category category : categories) {
-                MenuItem newMenuItem = categorySubMenu.add(0, itemId++, Menu.NONE, category.getName());
-                newMenuItem.setCheckable(true);
-            }
-
-            navView.setNavigationItemSelectedListener(this);
-
-            if(categorySelected != null){
-                navView.setCheckedItem(categorySelected);
-            }
+            requestTopTags(); //Async. fetch top tags from LastFm.
+            initDrawerSlider();
         }
-
-        //TODO: Add a default fragment?
     }
 
     @Override
@@ -117,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Re-instantiate the fragment only if a differnt category is chosen.
         if(categorySelected == null || item.getItemId() != categorySelected) {
             //I decided to store the songs into a variable, instead of passing into a bundle to reduce complexity.
-            SONGS = getCategories().get(item.getItemId()).getList();
+            //SONGS = getCategories().get(item.getItemId()).getList();
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
 
             /* MenuItems are in a group containing single click behaviour meaning that deselecting
@@ -125,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
              */
             navView.setCheckedItem(item.getItemId());
             categorySelected = item.getItemId();
-            setTitle(getCategories().get(item.getItemId()).getName());
+            //setTitle(getCategories().get(item.getItemId()).getName());
             appBarTitle = getTitle().toString();
 
             drawer.closeDrawer(GravityCompat.START);
@@ -136,31 +110,64 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false; //If false is returned, no item will be selected.
     }
 
-    /**
-     *
-     * @return List of Category models containing a list of Songs.
-     */
-    private List<Category> getCategories(){
-        List<Category> categories = new ArrayList<>();
+    private void initDrawerSlider(){
+        drawer = findViewById(R.id.draw_layout);
+        //Add Hamburger icon.
+        //TODO: The strings for impaired should be stored in Resources.
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState(); //Adds hamburger rotation as drawer opens.
+        //Add dynamic items to NavigationView.
+        navView = findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(this);
 
-        List<com.domgarr.UI_Challenge.models.Song> rockSongs = new ArrayList<com.domgarr.UI_Challenge.models.Song>();
-        rockSongs.add(new Song("Stairway To Heaven."));
-        rockSongs.add(new Song("We Will Rock You."));
-        Category rock = new Category("Rock", rockSongs);
-        categories.add(rock);
-
-        List<com.domgarr.UI_Challenge.models.Song> classicalSongs = new ArrayList<com.domgarr.UI_Challenge.models.Song>();
-        classicalSongs.add(new Song("SIBELIUS Violin Concerto in D minor, Op. 47"));
-        classicalSongs.add(new Song("Clair De Lune"));
-
-        Category classical = new Category("Classical", classicalSongs);
-        categories.add(classical);
-
-        CATEGORIES = categories;
-        return categories;
+        if(categorySelected != null){
+            navView.setCheckedItem(categorySelected);
+        }
     }
 
+    private void initToolbar(){
+        //Get reference to tool bar and set tool bar as action bar.
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitle(appBarTitle);
+    }
 
+    private void requestTopTags(){
+        Single<Response<TopTagResponse>> call = LastFm.getInstance().getLastFmService().topTags(LastFm.API_KEY);
+        call.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<TopTagResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Response<TopTagResponse> topTagResponseResponse) {
+                        tags = topTagResponseResponse.body().getTopTags().getTags();
+                        populateDrawerMenu(tags);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+    }
+
+    private void populateDrawerMenu(List<Tag> tags){
+        Menu menu = navView.getMenu();
+        //Can safely use 0th index to grab submen since 'Categories' is the only Menu in menu's layout.
+        SubMenu categorySubMenu = menu.getItem(0).getSubMenu();
+
+        //Dynamically add MenuItems to SubMenu 'Categories'
+        int itemId = 0;
+        for(Tag tag : tags) {
+            MenuItem newMenuItem = categorySubMenu.add(0, itemId++, Menu.NONE, tag.getName());
+            newMenuItem.setCheckable(true);
+        }
+    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -180,14 +187,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onListFragmentInteraction(int categoryPosition) {
-        Log.d("POS", categoryPosition + "");
-        SONGS = getCategories().get(categoryPosition).getList();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
-        categorySelected = categoryPosition;
-        setTitle(getCategories().get(categoryPosition).getName());
-        appBarTitle = getTitle().toString();
+    public void onListFragmentInteraction(String tagname) {
+        Log.d("POS", tagname + "");
+       // SONGS = getCategories().get(tagname).getList();
+        //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
+        //categorySelected = tagname;
+        //setTitle(getCategories().get(tagname).getName());
+        //appBarTitle = getTitle().toString();
     }
-
 
 }

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -189,12 +190,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onListFragmentInteraction(String tagName) {
+        Log.d("TEST", tagName);
         this.tagName = tagName;
-        // SONGS = getCategories().get(tagname).getList();
-        //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, new SongFragment()).commit();
-        //categorySelected = tagname;
-        //setTitle(getCategories().get(tagname).getName());
-        //appBarTitle = getTitle().toString();
+
+        Fragment songFragment = new SongFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(TAG_NAME, tagName);
+        songFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_songs, songFragment).commit();
+
+        setTitle(tagName);
+        appBarTitle = getTitle().toString();
     }
 
 }

@@ -124,6 +124,7 @@ public class CategoryFragment extends Fragment {
                         tags = topTagResponseResponse.body().getTopTags().getTags();
                         recyclerView.setAdapter(new CategoryRecyclerViewAdapter(tags, listener, lastCategoryPosition));
                         recyclerView.setVisibility(View.VISIBLE);
+
                     }
 
                     @Override

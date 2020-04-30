@@ -1,41 +1,36 @@
 package com.domgarr.UI_Challenge;
 
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.domgarr.UI_Challenge.SongFragment.OnListFragmentInteractionListener;
-import com.domgarr.UI_Challenge.models.Song;
-import com.domgarr.UI_Challenge.models.Track;
+import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
+import com.domgarr.UI_Challenge.TrackFragment.OnListFragmentInteractionListener;
+import com.domgarr.UI_Challenge.models.Track;
 
 import java.util.List;
 
-public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerViewAdapter.ViewHolder> {
+public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecyclerViewAdapter.ViewHolder> {
     private final List<Track> tracks;
     private final OnListFragmentInteractionListener listener;
     private int selectedPosition = RecyclerView.NO_POSITION;
 
-    public SongRecyclerViewAdapter(List<Track> tracks, OnListFragmentInteractionListener listener, Integer restoredSelectedPosition) {
+    public TrackRecyclerViewAdapter(List<Track> tracks, OnListFragmentInteractionListener listener, Integer restoredSelectedPosition) {
         this.tracks = tracks;
         this.listener = listener;
 
         //Check to see if a previously selected position exists.
         selectedPosition = RecyclerView.NO_POSITION;
-        if(restoredSelectedPosition != null){
+        if (restoredSelectedPosition != null) {
             selectedPosition = restoredSelectedPosition;
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_song, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_track, parent, false);
         return new ViewHolder(view);
     }
 
@@ -60,7 +55,7 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
                 }
 
                 notifyItemChanged(selectedPosition);
-                selectedPosition =position;
+                selectedPosition = position;
                 notifyItemChanged(selectedPosition);
             }
         });
@@ -92,6 +87,7 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
             return super.toString() + " '" + trackNameView.getText() + "'";
         }
     }
+
     public int getSelectedPosition() {
         return selectedPosition;
     }

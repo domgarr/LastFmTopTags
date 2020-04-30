@@ -9,5 +9,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.domgarr.UI_Challenge.CategoryFragment"
-    tools:listitem="@layout/fragment_category" />
+    tools:context="com.domgarr.UI_Challenge.TagFragment"
+    tools:listitem="@layout/fragment_tag" />

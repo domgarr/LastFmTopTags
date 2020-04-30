@@ -1,28 +1,28 @@
 package com.domgarr.UI_Challenge;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.domgarr.UI_Challenge.CategoryFragment.OnListFragmentInteractionListener;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.domgarr.UI_Challenge.TagFragment.OnListFragmentInteractionListener;
 import com.domgarr.UI_Challenge.models.Tag;
 
 import java.util.List;
 
-public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.ViewHolder> {
+public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerViewAdapter.ViewHolder> {
 
     private final List<Tag> tags;
     private final OnListFragmentInteractionListener listener;
 
     private int selectedPosition = RecyclerView.NO_POSITION;
 
-    public CategoryRecyclerViewAdapter(List<Tag> tags, OnListFragmentInteractionListener listener, Integer lastCategoryPosition) {
+    public TagRecyclerViewAdapter(List<Tag> tags, OnListFragmentInteractionListener listener, Integer lastCategoryPosition) {
         this.tags = tags;
         this.listener = listener;
-        if(lastCategoryPosition != null){
+        if (lastCategoryPosition != null) {
             selectedPosition = lastCategoryPosition;
         }
     }
@@ -30,7 +30,7 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_category, parent, false);
+                .inflate(R.layout.fragment_tag, parent, false);
         return new ViewHolder(view);
     }
 
@@ -38,7 +38,7 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.tag = tags.get(position);
         holder.categoryNameView.setText(tags.get(position).getName());
-        holder.itemView.setSelected(selectedPosition == position );
+        holder.itemView.setSelected(selectedPosition == position);
     }
 
     @Override

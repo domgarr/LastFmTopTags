@@ -1,18 +1,9 @@
 package com.domgarr.UI_Challenge;
 
-import com.domgarr.UI_Challenge.models.Tag;
-import com.domgarr.UI_Challenge.models.TopTagResponse;
 import com.google.gson.Gson;
 
 import java.net.URL;
-import java.util.List;
 
-import io.reactivex.Single;
-import io.reactivex.SingleObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -28,7 +19,7 @@ public class LastFm {
     private LastFmService lastFmService;
     private static LastFm instance;
 
-    private LastFm(){
+    private LastFm() {
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(LAST_FM_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(new Gson()))
@@ -39,8 +30,8 @@ public class LastFm {
 
     }
 
-    public static LastFm getInstance(){
-        if(instance == null){
+    public static LastFm getInstance() {
+        if (instance == null) {
             instance = new LastFm();
         }
         return instance;
@@ -49,6 +40,5 @@ public class LastFm {
     public LastFmService getLastFmService() {
         return lastFmService;
     }
-
 
 }

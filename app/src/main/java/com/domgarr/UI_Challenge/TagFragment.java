@@ -2,16 +2,16 @@ package com.domgarr.UI_Challenge;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.domgarr.UI_Challenge.models.Tag;
 import com.domgarr.UI_Challenge.models.TopTagResponse;
@@ -25,13 +25,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
-public class CategoryFragment extends Fragment {
+import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
+
+public class TagFragment extends Fragment {
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
 
@@ -43,7 +39,7 @@ public class CategoryFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public CategoryFragment() {
+    public TagFragment() {
     }
 
     @Override
@@ -51,7 +47,7 @@ public class CategoryFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = this.getArguments();
-        if(bundle != null){
+        if (bundle != null) {
             lastCategoryPosition = bundle.getInt(MainActivity.CATEGORY_SELECTED);
         }
         requestTopTags();
@@ -65,13 +61,15 @@ public class CategoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_category_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_tag_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), VERTICAL);
+            recyclerView.addItemDecoration(itemDecor);
         }
         return view;
     }
@@ -99,7 +97,7 @@ public class CategoryFragment extends Fragment {
         void onListFragmentInteraction(String tagName);
     }
 
-    private void requestTopTags(){
+    private void requestTopTags() {
         Single<Response<TopTagResponse>> call = LastFm.getInstance().getLastFmService().topTags(LastFm.API_KEY);
         call.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -112,14 +110,13 @@ public class CategoryFragment extends Fragment {
                     @Override
                     public void onSuccess(Response<TopTagResponse> topTagResponseResponse) {
                         tags = topTagResponseResponse.body().getTopTags().getTags();
-                        recyclerView.setAdapter(new CategoryRecyclerViewAdapter(tags, listener, lastCategoryPosition));
+                        recyclerView.setAdapter(new TagRecyclerViewAdapter(tags, listener, lastCategoryPosition));
                         recyclerView.setVisibility(View.VISIBLE);
-
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        //TODO: Maybe notify user with a Toast
                     }
                 });
     }

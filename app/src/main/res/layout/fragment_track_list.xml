@@ -9,6 +9,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.domgarr.UI_Challenge.SongFragment"
-    tools:listitem="@layout/fragment_song"
-    />
+    tools:context="com.domgarr.UI_Challenge.TrackFragment"
+    tools:listitem="@layout/fragment_track" />

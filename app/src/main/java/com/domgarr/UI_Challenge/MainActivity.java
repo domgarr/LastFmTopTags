@@ -1,5 +1,12 @@
 package com.domgarr.UI_Challenge;
 
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,19 +15,10 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SubMenu;
-
-import com.domgarr.UI_Challenge.models.Song;
 import com.domgarr.UI_Challenge.models.Tag;
 import com.domgarr.UI_Challenge.models.TopTagResponse;
 import com.domgarr.UI_Challenge.models.Track;
 import com.google.android.material.navigation.NavigationView;
-
 
 import java.util.List;
 
@@ -31,8 +29,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SongFragment.OnListFragmentInteractionListener, CategoryFragment.OnListFragmentInteractionListener {
-    public static List<Song> SONGS;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TrackFragment.OnListFragmentInteractionListener, TagFragment.OnListFragmentInteractionListener {
     public static List<Tag> tags;
     public static final int TOP_TRACK_LIMIT = 15;
 
@@ -65,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //TODO: Refactor into two methods.
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Fragment categoryFragment = new CategoryFragment();
+            Fragment categoryFragment = new TagFragment();
             Bundle bundle = new Bundle();
             bundle.putInt(CATEGORY_SELECTED, tagSelected);
             categoryFragment.setArguments(bundle);
@@ -88,13 +85,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //TODO: When a category is selected, while already being selected, the song item selected is lost. Prevent app from re-initialzing an Fragment if category is clicked twice.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        //Re-instantiate the fragment only if a differnt category is chosen.
+        //Re-instantiate the fragment only if a different category is chosen.
         if (tagSelected == null || item.getItemId() != tagSelected) {
             navView.setCheckedItem(item.getItemId());
             tagSelected = item.getItemId();
             tagName = tags.get(tagSelected).getName();
 
-            Fragment songFragment = new SongFragment();
+            Fragment songFragment = new TrackFragment();
             Bundle bundle = new Bundle();
             bundle.putString(TAG_NAME, tagName);
             songFragment.setArguments(bundle);
@@ -114,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initDrawerSlider() {
         drawer = findViewById(R.id.draw_layout);
         //Add Hamburger icon.
-        //TODO: The strings for impaired should be stored in Resources.
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState(); //Adds hamburger rotation as drawer opens.
@@ -193,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("TEST", tagName);
         this.tagName = tagName;
 
-        Fragment songFragment = new SongFragment();
+        Fragment songFragment = new TrackFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TAG_NAME, tagName);
         songFragment.setArguments(bundle);
@@ -202,5 +198,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle(tagName);
         appBarTitle = getTitle().toString();
     }
-
 }

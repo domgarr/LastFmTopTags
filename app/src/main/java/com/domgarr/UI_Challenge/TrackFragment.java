@@ -2,17 +2,16 @@ package com.domgarr.UI_Challenge;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.domgarr.UI_Challenge.models.Song;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.domgarr.UI_Challenge.models.TopTrackResponse;
 import com.domgarr.UI_Challenge.models.Track;
 
@@ -25,9 +24,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
-public class SongFragment extends Fragment {
+import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
+
+public class TrackFragment extends Fragment {
     private RecyclerView recyclerView;
-    private SongRecyclerViewAdapter songRecyclerViewAdapter;
+    private TrackRecyclerViewAdapter songRecyclerViewAdapter;
     public static final String SELECTED_POSITION = "selectedPosition";
     private Integer selectedPosition;
 
@@ -35,11 +36,12 @@ public class SongFragment extends Fragment {
     private OnListFragmentInteractionListener listener;
     private List<Track> tracks;
     private String tagName;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public SongFragment() {
+    public TrackFragment() {
     }
 
     @Override
@@ -51,12 +53,12 @@ public class SongFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             selectedPosition = savedInstanceState.getInt(SELECTED_POSITION);
         }
 
         Bundle bundle = getArguments();
-        if(bundle != null){
+        if (bundle != null) {
             tagName = bundle.getString(MainActivity.TAG_NAME);
         }
 
@@ -65,13 +67,15 @@ public class SongFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_song_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_track_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), VERTICAL);
+            recyclerView.addItemDecoration(itemDecor);
         }
         return view;
     }
@@ -97,13 +101,13 @@ public class SongFragment extends Fragment {
         void onListFragmentInteraction(Track track);
     }
 
-    private void requestTopTracks(){
+    private void requestTopTracks() {
         Single<Response<TopTrackResponse>> call = LastFm.getInstance().getLastFmService().topTracks(LastFm.API_KEY, tagName, MainActivity.TOP_TRACK_LIMIT);
 
-                call
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new SingleObserver<Response<TopTrackResponse>>() {
+        call
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<TopTrackResponse>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
@@ -115,13 +119,13 @@ public class SongFragment extends Fragment {
                         getTracks() called twice is due to the layout of the API
                          */
                         tracks = topTrackResponseResponse.body().getTracks().getTracks();
-                        songRecyclerViewAdapter = new SongRecyclerViewAdapter(tracks, listener, selectedPosition);
+                        songRecyclerViewAdapter = new TrackRecyclerViewAdapter(tracks, listener, selectedPosition);
                         recyclerView.setAdapter(songRecyclerViewAdapter);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        //TODO: Maybe notify user with a Toast
                     }
                 });
 

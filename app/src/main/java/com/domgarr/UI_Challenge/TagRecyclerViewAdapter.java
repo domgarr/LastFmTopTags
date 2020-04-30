@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.domgarr.UI_Challenge.TagFragment.OnListFragmentInteractionListener;
-import com.domgarr.UI_Challenge.models.Tag;
+import com.domgarr.UI_Challenge.models.top_tag_response.Tag;
 
 import java.util.List;
 
@@ -46,7 +46,6 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
         return tags.size();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View view;
         public final TextView categoryNameView;
@@ -66,9 +65,11 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
 
         @Override
         public void onClick(View v) {
+            //Highlight item when selected.
             notifyItemChanged(selectedPosition);
             selectedPosition = getLayoutPosition();
             notifyItemChanged(selectedPosition);
+            //Tell MainActivity that Tag selected has changed and to update TrackFragment.
             listener.onListFragmentInteraction(tags.get(selectedPosition).getName());
         }
     }

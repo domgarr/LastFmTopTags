@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.domgarr.UI_Challenge.TrackFragment.OnListFragmentInteractionListener;
-import com.domgarr.UI_Challenge.models.Track;
+import com.domgarr.UI_Challenge.models.top_track_response.Track;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
                     // fragment is attached to one) that an item has been selected.
                     listener.onListFragmentInteraction(holder.track);
                 }
-
+                //Highlights selected item.
                 notifyItemChanged(selectedPosition);
                 selectedPosition = position;
                 notifyItemChanged(selectedPosition);

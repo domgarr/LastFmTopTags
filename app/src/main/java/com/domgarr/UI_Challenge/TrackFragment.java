@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.domgarr.UI_Challenge.models.TopTrackResponse;
-import com.domgarr.UI_Challenge.models.Track;
+import com.domgarr.UI_Challenge.models.top_track_response.TopTrackResponse;
+import com.domgarr.UI_Challenge.models.top_track_response.Track;
 
 import java.util.List;
 
@@ -74,6 +74,8 @@ public class TrackFragment extends Fragment {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
+
+            // Add divider between list items.
             DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), VERTICAL);
             recyclerView.addItemDecoration(itemDecor);
         }
@@ -85,9 +87,6 @@ public class TrackFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             listener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
         }
     }
 
@@ -102,10 +101,8 @@ public class TrackFragment extends Fragment {
     }
 
     private void requestTopTracks() {
-        Single<Response<TopTrackResponse>> call = LastFm.getInstance().getLastFmService().topTracks(LastFm.API_KEY, tagName, MainActivity.TOP_TRACK_LIMIT);
-
-        call
-                .subscribeOn(Schedulers.io())
+        Single<Response<TopTrackResponse>> topTracksRequest = LastFm.getInstance().getLastFmService().topTracks(LastFm.API_KEY, tagName, MainActivity.TOP_TRACK_LIMIT);
+        topTracksRequest.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<TopTrackResponse>>() {
                     @Override
@@ -125,7 +122,7 @@ public class TrackFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        //TODO: Maybe notify user with a Toast
+                        //TODO: Maybe notify user with a Toast and retry
                     }
                 });
 

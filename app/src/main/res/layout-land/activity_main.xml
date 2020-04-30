@@ -32,13 +32,13 @@
         android:orientation="horizontal"
         >
         <FrameLayout
-            android:id="@+id/fragment_container_categories"
+            android:id="@+id/fragment_container_tags"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"/>
 
         <FrameLayout
-            android:id="@+id/fragment_container_songs"
+            android:id="@+id/fragment_container_tracks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"/>

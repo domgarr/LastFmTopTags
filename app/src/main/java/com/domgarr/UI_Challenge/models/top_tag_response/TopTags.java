@@ -1,4 +1,4 @@
-package com.domgarr.UI_Challenge.models;
+package com.domgarr.UI_Challenge.models.top_tag_response;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -13,8 +12,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.domgarr.UI_Challenge.models.Tag;
-import com.domgarr.UI_Challenge.models.TopTagResponse;
+import com.domgarr.UI_Challenge.models.top_tag_response.Tag;
+import com.domgarr.UI_Challenge.models.top_tag_response.TopTagResponse;
 
 import java.util.List;
 
@@ -29,26 +28,21 @@ import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 public class TagFragment extends Fragment {
     private RecyclerView recyclerView;
-    private ProgressBar progressBar;
 
     private OnListFragmentInteractionListener listener;
-    private Integer lastCategoryPosition;
-    private List<Tag> tags;
+    private Integer lastTagPosition; //Used to restore state after orientation change.
+    private List<Tag> tags; //Populated with API call to Last FM.
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public TagFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //Bundle arguments are set via MainActivity before committing Fragment.
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            lastCategoryPosition = bundle.getInt(MainActivity.CATEGORY_SELECTED);
+            lastTagPosition = bundle.getInt(MainActivity.TAG_SELECTED);
         }
         requestTopTags();
     }
@@ -65,9 +59,12 @@ public class TagFragment extends Fragment {
 
         // Set the adapter
         if (view instanceof RecyclerView) {
+            //The recycler view is set aysn. after data is fetched from Last FM. See requestTopTags()
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
+
+            //Add divier between list items
             DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), VERTICAL);
             recyclerView.addItemDecoration(itemDecor);
         }
@@ -93,13 +90,12 @@ public class TagFragment extends Fragment {
     }
 
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(String tagName);
     }
 
     private void requestTopTags() {
-        Single<Response<TopTagResponse>> call = LastFm.getInstance().getLastFmService().topTags(LastFm.API_KEY);
-        call.subscribeOn(Schedulers.io())
+        Single<Response<TopTagResponse>> topTagsRequest = LastFm.getInstance().getLastFmService().topTags(LastFm.API_KEY);
+        topTagsRequest.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<TopTagResponse>>() {
                     @Override
@@ -110,13 +106,12 @@ public class TagFragment extends Fragment {
                     @Override
                     public void onSuccess(Response<TopTagResponse> topTagResponseResponse) {
                         tags = topTagResponseResponse.body().getTopTags().getTags();
-                        recyclerView.setAdapter(new TagRecyclerViewAdapter(tags, listener, lastCategoryPosition));
-                        recyclerView.setVisibility(View.VISIBLE);
+                        recyclerView.setAdapter(new TagRecyclerViewAdapter(tags, listener, lastTagPosition));
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        //TODO: Maybe notify user with a Toast
+                        //TODO: Maybe notify user with a Toast and retry
                     }
                 });
     }

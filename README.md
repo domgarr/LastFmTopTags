@@ -2,6 +2,10 @@
 ## Installation
 Clone or download ZIP and simply open in Android Studios.
 
+If Unsupported Module Detected try:
+- File -> Invalidate Caches and Restart OR delete .idea directory and .iml file and re-open the project.
+
+
 ## Features
 ### Portrait Mode
 - An empty fragment is displayed upon opening the app. Clicking the hamburger icon displays the list of top tags in order by popularity in a menu drawer.

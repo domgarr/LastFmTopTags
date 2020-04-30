@@ -8,19 +8,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.domgarr.UI_Challenge.CategoryFragment.OnListFragmentInteractionListener;
-import com.domgarr.UI_Challenge.models.Category;
+import com.domgarr.UI_Challenge.models.Tag;
 
 import java.util.List;
 
 public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Category> categories;
+    private final List<Tag> tags;
     private final OnListFragmentInteractionListener listener;
 
     private int selectedPosition = RecyclerView.NO_POSITION;
 
-    public CategoryRecyclerViewAdapter(List<Category> categories, OnListFragmentInteractionListener listener, Integer lastCategoryPosition) {
-        this.categories = categories;
+    public CategoryRecyclerViewAdapter(List<Tag> tags, OnListFragmentInteractionListener listener, Integer lastCategoryPosition) {
+        this.tags = tags;
         this.listener = listener;
         if(lastCategoryPosition != null){
             selectedPosition = lastCategoryPosition;
@@ -36,21 +36,21 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.category = categories.get(position);
-        holder.categoryNameView.setText(categories.get(position).getName());
+        holder.tag = tags.get(position);
+        holder.categoryNameView.setText(tags.get(position).getName());
         holder.itemView.setSelected(selectedPosition == position );
     }
 
     @Override
     public int getItemCount() {
-        return categories.size();
+        return tags.size();
     }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View view;
         public final TextView categoryNameView;
-        public Category category;
+        public Tag tag;
 
         public ViewHolder(View view) {
             super(view);

@@ -5,17 +5,25 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
-import com.domgarr.UI_Challenge.models.Category;
+import com.domgarr.UI_Challenge.models.Tag;
+import com.domgarr.UI_Challenge.models.TopTagResponse;
 
 import java.util.List;
+
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
 
 /**
  * A fragment representing a list of Items.
@@ -24,9 +32,12 @@ import java.util.List;
  * interface.
  */
 public class CategoryFragment extends Fragment {
+    private RecyclerView recyclerView;
+    private ProgressBar progressBar;
 
     private OnListFragmentInteractionListener listener;
     private Integer lastCategoryPosition;
+    private List<Tag> tags;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -43,6 +54,7 @@ public class CategoryFragment extends Fragment {
         if(bundle != null){
             lastCategoryPosition = bundle.getInt(MainActivity.CATEGORY_SELECTED);
         }
+        requestTopTags();
     }
 
     @Override
@@ -58,9 +70,8 @@ public class CategoryFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new CategoryRecyclerViewAdapter(MainActivity.CATEGORIES, listener, lastCategoryPosition));
         }
         return view;
     }
@@ -96,6 +107,30 @@ public class CategoryFragment extends Fragment {
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(int categoryPosition);
+    }
+
+    private void requestTopTags(){
+        Single<Response<TopTagResponse>> call = LastFm.getInstance().getLastFmService().topTags(LastFm.API_KEY);
+        call.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<TopTagResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Response<TopTagResponse> topTagResponseResponse) {
+                        tags = topTagResponseResponse.body().getTopTags().getTags();
+                        recyclerView.setAdapter(new CategoryRecyclerViewAdapter(tags, listener, lastCategoryPosition));
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
     }
 
 

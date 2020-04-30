@@ -19,7 +19,9 @@ import com.domgarr.UI_Challenge.models.Category;
 import com.domgarr.UI_Challenge.models.Song;
 import com.google.android.material.navigation.NavigationView;
 
+
 import java.util.ArrayList;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SongFragment.OnListFragmentInteractionListener, CategoryFragment.OnListFragmentInteractionListener {
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static final String CATEGORY_SELECTED = "categorySelected";
     private static final String APP_BAR_TITLE = "appBarTitle";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +59,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle(appBarTitle);
 
 
-        //TODO: Refactor into two methods.
+
+
+
+                 //TODO: Refactor into two methods.
         int orientation = getResources().getConfiguration().orientation;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             Fragment categoryFragment = new CategoryFragment();
@@ -105,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
     //TODO: When a category is selected, while already being selected, the song item selected is lost. Prevent app from re-initialzing an Fragment if category is clicked twice.
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         //Re-instantiate the fragment only if a differnt category is chosen.
@@ -182,4 +188,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle(getCategories().get(categoryPosition).getName());
         appBarTitle = getTitle().toString();
     }
+
+
 }

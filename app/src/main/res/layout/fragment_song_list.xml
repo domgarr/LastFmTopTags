@@ -11,5 +11,4 @@
     app:layoutManager="LinearLayoutManager"
     tools:context="com.domgarr.UI_Challenge.SongFragment"
     tools:listitem="@layout/fragment_song"
-
     />

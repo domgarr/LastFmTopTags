@@ -2,6 +2,7 @@ package com.domgarr.UI_Challenge;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,20 +17,10 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link Song} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerViewAdapter.ViewHolder> {
-
     private final List<Track> tracks;
     private final OnListFragmentInteractionListener listener;
     private int selectedPosition = RecyclerView.NO_POSITION;
-
-    public int getSelectedPosition() {
-        return selectedPosition;
-    }
 
     public SongRecyclerViewAdapter(List<Track> tracks, OnListFragmentInteractionListener listener, Integer restoredSelectedPosition) {
         this.tracks = tracks;
@@ -67,6 +58,10 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
                     // fragment is attached to one) that an item has been selected.
                     listener.onListFragmentInteraction(holder.track);
                 }
+
+                notifyItemChanged(selectedPosition);
+                selectedPosition =position;
+                notifyItemChanged(selectedPosition);
             }
         });
     }
@@ -76,7 +71,7 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
         return tracks.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView trackNameView;
         public final TextView trackArtistView;
@@ -87,25 +82,17 @@ public class SongRecyclerViewAdapter extends RecyclerView.Adapter<SongRecyclerVi
         public ViewHolder(View view) {
             super(view);
             this.view = view;
-
             trackNameView = (TextView) view.findViewById(R.id.song_name);
             trackArtistView = (TextView) view.findViewById(R.id.artist_name);
             trackRankView = (TextView) view.findViewById(R.id.song_rank);
-            trackNameView.setOnClickListener(this);
         }
 
         @Override
         public String toString() {
             return super.toString() + " '" + trackNameView.getText() + "'";
         }
-
-        @Override
-        public void onClick(View v) {
-            //Selected song is highlighted here.
-            //TODO: Understand this better.
-            notifyItemChanged(selectedPosition);
-            selectedPosition = getLayoutPosition();
-            notifyItemChanged(selectedPosition);
-        }
+    }
+    public int getSelectedPosition() {
+        return selectedPosition;
     }
 }

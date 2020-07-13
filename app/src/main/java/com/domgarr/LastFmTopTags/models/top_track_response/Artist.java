@@ -1,4 +1,4 @@
-package com.domgarr.UI_Challenge.models.top_track_response;
+package com.domgarr.LastFmTopTags.models.top_track_response;
 
 import com.google.gson.annotations.SerializedName;
 

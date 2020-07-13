@@ -1,4 +1,4 @@
-package com.domgarr.UI_Challenge;
+package com.domgarr.LastFmTopTags;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -14,9 +14,9 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.domgarr.UI_Challenge.models.top_tag_response.Tag;
-import com.domgarr.UI_Challenge.models.top_tag_response.TopTagResponse;
-import com.domgarr.UI_Challenge.models.top_track_response.Track;
+import com.domgarr.LastFmTopTags.models.top_tag_response.Tag;
+import com.domgarr.LastFmTopTags.models.top_tag_response.TopTagResponse;
+import com.domgarr.LastFmTopTags.models.top_track_response.Track;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;

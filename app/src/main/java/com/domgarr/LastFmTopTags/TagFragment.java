@@ -1,4 +1,4 @@
-package com.domgarr.UI_Challenge;
+package com.domgarr.LastFmTopTags;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.domgarr.UI_Challenge.models.top_tag_response.Tag;
-import com.domgarr.UI_Challenge.models.top_tag_response.TopTagResponse;
+import com.domgarr.LastFmTopTags.models.top_tag_response.Tag;
+import com.domgarr.LastFmTopTags.models.top_tag_response.TopTagResponse;
 
 import java.util.List;
 

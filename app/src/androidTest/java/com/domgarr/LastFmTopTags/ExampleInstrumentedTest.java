@@ -1,4 +1,4 @@
-package com.domgarr.UI_Challenge;
+package com.domgarr.LastFmTopTags;
 
 import android.content.Context;
 

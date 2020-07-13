@@ -1,7 +1,7 @@
-package com.domgarr.UI_Challenge;
+package com.domgarr.LastFmTopTags;
 
-import com.domgarr.UI_Challenge.models.top_tag_response.TopTagResponse;
-import com.domgarr.UI_Challenge.models.top_track_response.TopTrackResponse;
+import com.domgarr.LastFmTopTags.models.top_tag_response.TopTagResponse;
+import com.domgarr.LastFmTopTags.models.top_track_response.TopTrackResponse;
 
 import io.reactivex.Single;
 import retrofit2.Response;

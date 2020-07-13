@@ -1,4 +1,4 @@
-package com.domgarr.UI_Challenge;
+package com.domgarr.LastFmTopTags;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,8 +7,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.domgarr.UI_Challenge.TagFragment.OnListFragmentInteractionListener;
-import com.domgarr.UI_Challenge.models.top_tag_response.Tag;
+import com.domgarr.LastFmTopTags.TagFragment.OnListFragmentInteractionListener;
+import com.domgarr.LastFmTopTags.models.top_tag_response.Tag;
 
 import java.util.List;
 

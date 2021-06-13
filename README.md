@@ -1,5 +1,4 @@
 # UI-Challenge
-##
 The following project was built for an automotive company's interviewing process.
 
 ## Installation
